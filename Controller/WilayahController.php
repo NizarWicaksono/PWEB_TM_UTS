@@ -2,27 +2,23 @@
 // Memanggil model yang diperlukan
 require_once 'Model/Wilayah.php';
 
-class ApiController {
+// NAMA CLASS DIPERBAIKI
+class WilayahController {
 
-    private $db;
     private $wilayahModel;
 
-    public function __construct() {
-        // Membuat koneksi database
-        $this->db = require 'Config/database.php';
-        // Membuat instance dari model Wilayah
-        $this->wilayahModel = new Wilayah($this->db);
+    // CONSTRUCTOR DIPERBAIKI: Menggunakan $pdo yang dikirim dari index.php
+    public function __construct($pdo) {
+        $this->wilayahModel = new Wilayah($pdo);
     }
 
     /**
      * Mengambil dan menampilkan semua provinsi dalam format JSON.
      */
     public function getProvinsi() {
-        // Mengatur header agar browser tahu ini adalah respons JSON
         header('Content-Type: application/json');
         
         $provinsi = $this->wilayahModel->getAllProvinsi();
-        // Mengubah array PHP menjadi string JSON dan menampilkannya
         echo json_encode($provinsi);
     }
 
@@ -32,16 +28,13 @@ class ApiController {
     public function getKota() {
         header('Content-Type: application/json');
         
-        // Memastikan parameter provinsi_id ada di URL
         if (isset($_GET['provinsi_id'])) {
             $provinsi_id = $_GET['provinsi_id'];
             $kota = $this->wilayahModel->getKotaByProvinsiId($provinsi_id);
             echo json_encode($kota);
         } else {
-            // Jika tidak ada parameter, kirim array kosong
             echo json_encode([]);
         }
     }
 }
 ?>
-
