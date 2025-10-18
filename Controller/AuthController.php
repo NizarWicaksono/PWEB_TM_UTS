@@ -8,12 +8,10 @@ class AuthController {
         $this->userModel = new User($pdo);
     }
 
-    // Menampilkan halaman register
     public function register() {
         require 'View/Register.php';
     }
 
-    // Memproses data dari form register
     public function processRegister() {
         $username = $_POST['username'];
         $password = $_POST['password'];
@@ -36,19 +34,16 @@ class AuthController {
         }
     }
 
-    // Menampilkan halaman login
     public function login() {
         require 'View/Login.php';
     }
 
-    // Memproses data dari form login
     public function processLogin() {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
         $user = $this->userModel->findByUsername($username);
 
-        // PERUBAHAN: Pengecekan password sekarang menggunakan perbandingan string biasa
         if ($user && $password === $user['password']) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
@@ -59,7 +54,6 @@ class AuthController {
         }
     }
 
-    // Fungsi untuk logout
     public function logout() {
         session_destroy();
         header("Location: index.php?action=login");
@@ -67,4 +61,3 @@ class AuthController {
     }
 }
 ?>
-

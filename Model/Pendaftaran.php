@@ -6,58 +6,49 @@ class Pendaftaran {
         $this->pdo = $pdo;
     }
 
-    // --- FUNGSI UNTUK MENGURUS UPLOAD FILE ---
     private function uploadFile($file) {
-        // Jika tidak ada file yang diupload atau terjadi error, kembalikan null
         if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
             return null;
         }
-
-        $targetDir = "Public/"; // Folder tujuan
-        // Membuat nama file yang unik untuk menghindari penimpaan file
+        $targetDir = "Public/";
         $fileName = uniqid() . '_' . basename($file["name"]);
         $targetFile = $targetDir . $fileName;
-
-        // Pindahkan file dari lokasi sementara ke folder Public
         if (move_uploaded_file($file["tmp_name"], $targetFile)) {
-            return $fileName; // Kembalikan nama file jika berhasil
+            return $fileName;
         } else {
-            return null; // Kembalikan null jika gagal
+            return null;
         }
     }
 
     public function create($postData, $files) {
-        // Proses upload foto lisensi
         $namaFileLisensi = $this->uploadFile($files['foto_lisensi']);
-
-        // Menggabungkan pilihan checkbox menjadi satu string
         $jenisMobil = isset($postData['jenis_mobil']) ? implode(', ', $postData['jenis_mobil']) : '';
 
-        $sql = "INSERT INTO pendaftaran (user_id, nama_lengkap, usia, provinsi_id, kota_id, alamat, kategori, jenis_mobil, foto_lisensi, tanda_tangan) 
+        $sql = "INSERT INTO pendaftaran (user_id, nama_lengkap, usia, provinsi, kota, alamat, kategori_balap, jenis_mobil, foto_lisensi_path, tanda_tangan_path) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $this->pdo->prepare($sql);
         
         return $stmt->execute([
-            $_SESSION['user_id'], // Ambil user_id dari session
+            $_SESSION['user_id'],
             $postData['nama_lengkap'],
             $postData['usia'],
-            $postData['provinsi'], // Sesuaikan dengan 'name' di form
-            $postData['kota'],     // Sesuaikan dengan 'name' di form
+            $postData['provinsi'],
+            $postData['kota'],
             $postData['alamat'],
-            $postData['kategori_balap'], // Sesuaikan dengan 'name' di form
+            $postData['kategori_balap'],
             $jenisMobil,
-            $namaFileLisensi, // Gunakan nama file yang sudah di-upload
+            $namaFileLisensi,
             $postData['tanda_tangan']
         ]);
     }
 
     public function getAll() {
-        $sql = "SELECT p.*, u.username, pr.nama_provinsi, k.nama_kota 
+        $sql = "SELECT p.*, u.username, prov.nama_provinsi, kota.nama_kota
                 FROM pendaftaran p
                 JOIN users u ON p.user_id = u.id
-                JOIN provinsi pr ON p.provinsi_id = pr.id
-                JOIN kota_kabupaten k ON p.kota_id = k.id
+                LEFT JOIN provinsi prov ON p.provinsi = prov.id
+                LEFT JOIN kota_kabupaten kota ON p.kota = kota.id
                 ORDER BY p.created_at DESC";
         
         $stmt = $this->pdo->query($sql);
@@ -65,11 +56,11 @@ class Pendaftaran {
     }
 
     public function getById($id) {
-        $sql = "SELECT p.*, u.username, pr.nama_provinsi, k.nama_kota 
+        $sql = "SELECT p.*, u.username, prov.nama_provinsi, kota.nama_kota
                 FROM pendaftaran p
                 JOIN users u ON p.user_id = u.id
-                JOIN provinsi pr ON p.provinsi_id = pr.id
-                JOIN kota_kabupaten k ON p.kota_id = k.id
+                LEFT JOIN provinsi prov ON p.provinsi = prov.id
+                LEFT JOIN kota_kabupaten kota ON p.kota = kota.id
                 WHERE p.id = ?";
                 
         $stmt = $this->pdo->prepare($sql);
@@ -79,12 +70,9 @@ class Pendaftaran {
 
     public function update($postData, $files) {
         $pendaftaranId = $postData['pendaftaran_id'];
-        
-        // Ambil data lama untuk mengecek file foto
         $dataLama = $this->getById($pendaftaranId);
-        $namaFileLisensi = $dataLama['foto_lisensi'];
+        $namaFileLisensi = $dataLama['foto_lisensi_path']; 
 
-        // Jika ada file baru yang diupload, proses upload dan ganti nama file lama
         if (isset($files['foto_lisensi']) && $files['foto_lisensi']['error'] === UPLOAD_ERR_OK) {
             $namaFileLisensi = $this->uploadFile($files['foto_lisensi']);
         }
@@ -92,8 +80,8 @@ class Pendaftaran {
         $jenisMobil = isset($postData['jenis_mobil']) ? implode(', ', $postData['jenis_mobil']) : '';
         
         $sql = "UPDATE pendaftaran SET 
-                    nama_lengkap = ?, usia = ?, provinsi_id = ?, kota_id = ?, alamat = ?, 
-                    kategori = ?, jenis_mobil = ?, foto_lisensi = ?, tanda_tangan = ?
+                    nama_lengkap = ?, usia = ?, provinsi = ?, kota = ?, alamat = ?, 
+                    kategori_balap = ?, jenis_mobil = ?, foto_lisensi_path = ?, tanda_tangan_path = ?
                 WHERE id = ?";
         
         $stmt = $this->pdo->prepare($sql);
@@ -110,6 +98,26 @@ class Pendaftaran {
             $postData['tanda_tangan'],
             $pendaftaranId
         ]);
+    }
+    
+    public function delete($id, $userId) {
+        $stmt = $this->pdo->prepare("SELECT foto_lisensi_path FROM pendaftaran WHERE id = ? AND user_id = ?");
+        $stmt->execute([$id, $userId]);
+        $pendaftaran = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($pendaftaran) {
+            $deleteStmt = $this->pdo->prepare("DELETE FROM pendaftaran WHERE id = ?");
+            $deleteStmt->execute([$id]);
+
+            if (!empty($pendaftaran['foto_lisensi_path'])) {
+                $filePath = 'Public/' . $pendaftaran['foto_lisensi_path'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }
 ?>

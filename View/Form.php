@@ -1,14 +1,10 @@
 <?php
-// Cek login, sama seperti di dashboard
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php?action=login');
     exit();
 }
 
-// Menentukan mode form: 'edit' atau 'buat baru'.
-// Jika variabel $pendaftaran ada (dikirim dari controller saat action=editPendaftaran), maka ini mode edit.
 $isEditMode = isset($pendaftaran) && $pendaftaran;
-// Menentukan URL tujuan form berdasarkan mode
 $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?action=createPendaftaran';
 ?>
 <!DOCTYPE html>
@@ -29,14 +25,12 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
         <div class="form-container">
             <div class="form-header">
                 <h2><?= $isEditMode ? 'Edit Data Pembalap' : 'Formulir Pendaftaran Pembalap' ?></h2>
-                <p class="text-muted">Silakan isi data di bawah ini dengan lengkap.</p>
+                <p class="text-muted">Silakan isi data di bawah.</p>
             </div>
             
-            <!-- Form menggunakan method="post" dan enctype untuk upload file -->
             <form id="formPembalap" action="<?= $formAction ?>" method="post" enctype="multipart/form-data">
                 
                 <?php if ($isEditMode): ?>
-                    <!-- Input tersembunyi untuk menyimpan ID pendaftaran saat mode edit -->
                     <input type="hidden" name="pendaftaran_id" value="<?= htmlspecialchars($pendaftaran['id']) ?>">
                 <?php endif; ?>
 
@@ -126,29 +120,24 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
         const provinsiSelect = document.getElementById('provinsi');
         const kotaSelect = document.getElementById('kota');
         
-        // Ambil data ID dari PHP untuk pre-selection di mode edit
         const selectedProvinsiId = '<?= $pendaftaran['provinsi_id'] ?? '' ?>';
         const selectedKotaId = '<?= $pendaftaran['kota_id'] ?? '' ?>';
 
-        // Ambil data provinsi dari API
         fetch('index.php?action=getProvinsi')
             .then(response => response.json())
             .then(data => {
                 data.forEach(provinsi => {
-                    // value dari option adalah ID, teksnya adalah nama provinsi
                     const option = new Option(provinsi.nama_provinsi, provinsi.id);
                     if (provinsi.id == selectedProvinsiId) {
-                        option.selected = true; // Pilih otomatis jika mode edit
+                        option.selected = true; 
                     }
                     provinsiSelect.add(option);
                 });
-                // Jika dalam mode edit, langsung trigger event 'change' untuk memuat kota
                 if (selectedProvinsiId) {
                     provinsiSelect.dispatchEvent(new Event('change'));
                 }
             });
 
-        // Event listener untuk dropdown provinsi
         provinsiSelect.addEventListener('change', function() {
             const provinsiId = this.value;
             kotaSelect.innerHTML = '<option value="">-- Memuat Kota --</option>';
@@ -159,7 +148,6 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
                 return;
             }
 
-            // Ambil data kota dari API berdasarkan ID provinsi
             fetch(`index.php?action=getKota&provinsi_id=${provinsiId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -167,7 +155,7 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
                     data.forEach(kota => {
                         const option = new Option(kota.nama_kota, kota.id);
                         if (kota.id == selectedKotaId) {
-                            option.selected = true; // Pilih otomatis jika mode edit
+                            option.selected = true; 
                         }
                         kotaSelect.add(option);
                     });
@@ -175,7 +163,6 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
                 });
         });
         
-        // --- Logic untuk Canvas Tanda Tangan ---
         const canvas = document.getElementById('signature-canvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
@@ -184,7 +171,6 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         
-        // Jika mode edit dan ada data tanda tangan, gambar kembali di canvas
         <?php if ($isEditMode && !empty($pendaftaran['tanda_tangan'])): ?>
             const img = new Image();
             img.src = '<?= $pendaftaran['tanda_tangan'] ?>';
@@ -223,7 +209,6 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
         });
 
         document.getElementById('formPembalap').addEventListener('submit', function() {
-            // Hanya simpan data URL jika canvas tidak kosong
             if (!isCanvasBlank(canvas)) {
                 document.getElementById('tanda_tangan').value = canvas.toDataURL('image/png');
             }
@@ -238,4 +223,3 @@ $formAction = $isEditMode ? 'index.php?action=updatePendaftaran' : 'index.php?ac
     </script>
 </body>
 </html>
-

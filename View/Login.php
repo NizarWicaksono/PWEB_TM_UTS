@@ -31,7 +31,7 @@
                             </div>
                         </form>
                         <div class="text-center mt-3">
-                            <a href="index.php?action=register">Belum punya akun? Register di sini</a>
+                            Belum punya akun? <a href="index.php?action=register">Register di sini</a>
                         </div>
                     </div>
                 </div>

@@ -35,7 +35,7 @@
                             </div>
                         </form>
                         <div class="text-center mt-3">
-                            <a href="index.php?action=login">Sudah punya akun? Login di sini</a>
+                            Sudah punya akun? <a href="index.php?action=login">Login di sini</a>
                         </div>
                     </div>
                 </div>

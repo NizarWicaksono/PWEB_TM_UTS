@@ -22,9 +22,7 @@ class WilayahController {
         echo json_encode($provinsi);
     }
 
-    /**
-     * Mengambil dan menampilkan kota berdasarkan ID provinsi dalam format JSON.
-     */
+
     public function getKota() {
         header('Content-Type: application/json');
         

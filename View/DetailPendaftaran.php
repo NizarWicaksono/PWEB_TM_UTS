@@ -1,5 +1,4 @@
 <?php
-// Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php?action=login');
     exit();
@@ -14,7 +13,13 @@ if (!isset($_SESSION['user_id'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background: linear-gradient(to right, #6a11cb, #2575fc); padding: 40px 0; }
-        .detail-container { max-width: 800px; background-color: #ffffff; padding: 0; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .body-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+        }
+        .detail-container { max-width: 800px; width:100%; background-color: #ffffff; padding: 0; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); overflow: hidden; }
         .detail-header { background: linear-gradient(to right, #6a11cb, #2575fc); color: white; padding: 1.5rem 2.5rem; }
         .detail-body { padding: 2.5rem; }
         .list-group-item { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -24,7 +29,7 @@ if (!isset($_SESSION['user_id'])) {
     </style>
 </head>
 <body>
-    <div class="container my-5">
+    <div class="container body-container">
         <div class="detail-container">
             <div class="detail-header">
                 <h1 class="mb-0 fs-3">Detail Pendaftaran</h1>
@@ -38,14 +43,14 @@ if (!isset($_SESSION['user_id'])) {
                     <li class="list-group-item"><strong>Provinsi</strong><span class="data-value"><?= htmlspecialchars($pendaftaran['nama_provinsi']) ?></span></li>
                     <li class="list-group-item"><strong>Kota/Kabupaten</strong><span class="data-value"><?= htmlspecialchars($pendaftaran['nama_kota']) ?></span></li>
                     <li class="list-group-item"><strong>Alamat</strong><span class="data-value"><?= nl2br(htmlspecialchars($pendaftaran['alamat'])) ?></span></li>
-                    <li class="list-group-item"><strong>Kategori Balap</strong><span class="data-value"><?= htmlspecialchars($pendaftaran['kategori']) ?></span></li>
+                    <li class="list-group-item"><strong>Kategori Balap</strong><span class="data-value"><?= htmlspecialchars($pendaftaran['kategori_balap']) ?></span></li>
                     <li class="list-group-item"><strong>Jenis Mobil</strong><span class="data-value"><?= htmlspecialchars($pendaftaran['jenis_mobil']) ?></span></li>
                     <li class="list-group-item">
                         <strong>Foto Lisensi</strong>
                         <span class="data-value">
-                            <?php if (!empty($pendaftaran['foto_lisensi'])): ?>
-                                <a href="Public/<?= htmlspecialchars($pendaftaran['foto_lisensi']) ?>" target="_blank">
-                                    <img src="Public/<?= htmlspecialchars($pendaftaran['foto_lisensi']) ?>" alt="Foto Lisensi" class="data-image">
+                            <?php if (!empty($pendaftaran['foto_lisensi_path'])): ?>
+                                <a href="Public/<?= htmlspecialchars($pendaftaran['foto_lisensi_path']) ?>" target="_blank">
+                                    <img src="Public/<?= htmlspecialchars($pendaftaran['foto_lisensi_path']) ?>" alt="Foto Lisensi" class="data-image">
                                 </a>
                             <?php else: ?>
                                 Tidak diunggah
@@ -55,8 +60,8 @@ if (!isset($_SESSION['user_id'])) {
                     <li class="list-group-item">
                         <strong>Tanda Tangan</strong>
                         <span class="data-value">
-                            <?php if (!empty($pendaftaran['tanda_tangan'])): ?>
-                                <img src="<?= htmlspecialchars($pendaftaran['tanda_tangan']) ?>" alt="Tanda Tangan" class="data-image">
+                            <?php if (!empty($pendaftaran['tanda_tangan_path'])): ?>
+                                <img src="<?= htmlspecialchars($pendaftaran['tanda_tangan_path']) ?>" alt="Tanda Tangan" class="data-image">
                             <?php else: ?>
                                 Tidak ada
                             <?php endif; ?>

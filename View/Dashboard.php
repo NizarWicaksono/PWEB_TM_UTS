@@ -1,10 +1,8 @@
 <?php
-// Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php?action=login');
     exit();
 }
-// Ambil username dari session untuk ditampilkan
 $username = $_SESSION['username'] ?? 'Pengguna';
 ?>
 <!DOCTYPE html>
@@ -52,14 +50,12 @@ $username = $_SESSION['username'] ?? 'Pengguna';
             transition: all 0.3s ease;
             margin: 0.5rem;
             width: 100%;
-            max-width: 300px; /* Lebar tombol */
+            max-width: 300px; 
         }
-        /* Hover effect */
         .action-buttons .btn:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0,0,0,0.2);
         }
-        /* Background colors */
         .btn-pendaftaran {
             background: linear-gradient(45deg, #4a00e0, #4918acff);
         }
@@ -75,7 +71,7 @@ $username = $_SESSION['username'] ?? 'Pengguna';
     <div class="dashboard-card">
         <div class="welcome-header">
             <h1>Selamat Datang, <strong><?= htmlspecialchars($username) ?></strong>!</h1><br>
-            <p>Pilih aksi di bawah untuk melanjutkan.</p>
+            <p>Klik tombol di bawah untuk melanjutkan.</p>
         </div>
         
         <div class="action-buttons">
@@ -92,4 +88,3 @@ $username = $_SESSION['username'] ?? 'Pengguna';
     </div>
 </body>
 </html>
-

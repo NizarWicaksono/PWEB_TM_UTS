@@ -1,11 +1,9 @@
 <?php
-// Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php?action=login');
     exit();
 }
 
-// Ambil ID pengguna yang sedang login untuk perbandingan
 $current_user_id = $_SESSION['user_id'];
 ?>
 <!DOCTYPE html>
@@ -29,7 +27,6 @@ $current_user_id = $_SESSION['user_id'];
         <div class="table-container">
             <div class="table-header">
                 <h2>Riwayat Pendaftaran Pembalap</h2>
-                <p class="text-muted">Berikut adalah semua data pendaftaran yang telah masuk.</p>
             </div>
 
             <div class="table-responsive">
@@ -55,12 +52,15 @@ $current_user_id = $_SESSION['user_id'];
                                     <td><?= $index + 1 ?></td>
                                     <td><?= htmlspecialchars($p['nama_lengkap']) ?></td>
                                     <td><?= htmlspecialchars($p['usia']) ?></td>
-                                    <td><?= htmlspecialchars($p['kategori']) ?></td>
+                                    <td><?= htmlspecialchars($p['kategori_balap']) ?></td>
                                     <td><?= htmlspecialchars($p['nama_provinsi']) ?></td>
                                     <td class="action-buttons">
                                         <a href="index.php?action=detailPendaftaran&id=<?= $p['id'] ?>" class="btn btn-info btn-sm">Detail</a>
                                         <?php if ($p['user_id'] == $current_user_id): ?>
                                             <a href="index.php?action=editPendaftaran&id=<?= $p['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                            <a href="index.php?action=deletePendaftaran&id=<?= $p['id'] ?>" 
+                                               class="btn btn-danger btn-sm" 
+                                               onclick="return confirm('Apakah Anda yakin ingin menghapus pendaftaran ini?')">Delete</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

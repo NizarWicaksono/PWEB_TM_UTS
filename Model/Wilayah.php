@@ -6,13 +6,11 @@ class Wilayah {
         $this->pdo = $pdo;
     }
 
-    // Fungsi untuk mengambil semua provinsi dari database
     public function getAllProvinsi() {
         $stmt = $this->pdo->query("SELECT * FROM provinsi ORDER BY nama_provinsi ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Fungsi untuk mengambil kota/kabupaten berdasarkan ID provinsi yang dipilih
     public function getKotaByProvinsiId($provinsiId) {
         $stmt = $this->pdo->prepare("SELECT * FROM kota_kabupaten WHERE provinsi_id = ? ORDER BY nama_kota ASC");
         $stmt->execute([$provinsiId]);
